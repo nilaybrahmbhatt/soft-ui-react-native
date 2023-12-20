@@ -84,10 +84,12 @@ class Detail extends Component {
   openPhoto = () => this.refs.modalPhoto.open();
 
   getColor(value) {
-    const color = value.toLowerCase();
-    if (typeof Color.attributes[color] !== 'undefined') {
-      return Color.attributes[color];
-    }
+    console.log(value);
+    console.log("<<<<<<<<<value>>>>>>>>>");
+    // const color = value.toLowerCase();
+    // if (typeof Color.attributes[color] !== 'undefined') {
+    //   return Color.attributes[color];
+    // }
     return '#333';
   }
 

@@ -218,7 +218,7 @@ export default {
     fontWeight: '600',
     color: 'rgba(51, 51, 51, 1)',
     lineHeight: 40,
-    fontFamily: Constants.fontHeader,
+    // fontFamily: Constants.fontHeader,
   },
   iconClose: {
     marginRight: 16,

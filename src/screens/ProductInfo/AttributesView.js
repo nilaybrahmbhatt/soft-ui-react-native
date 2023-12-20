@@ -64,11 +64,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#666',
     textAlign: 'center',
-    fontFamily: Constants.fontFamily,
+    // fontFamily: Constants.fontFamily,
   },
   value: {
     margin: 5,
-    fontFamily: Constants.fontFamily,
+    // fontFamily: Constants.fontFamily,
     marginLeft: 10,
     color: '#5B5B5B',
     fontSize: 13,

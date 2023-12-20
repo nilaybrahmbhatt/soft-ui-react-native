@@ -10,6 +10,7 @@ import {
   Register,
   Pro,
   ProductInfo,
+  Cart,
 } from '../screens';
 import {useScreenOptions, useTranslation} from '../hooks';
 
@@ -36,7 +37,7 @@ export default () => {
         component={ProductInfo}
         // options={screenOptions.components}
       />
-      
+      <Stack.Screen name="Cart" component={Cart} options={screenOptions.back} />
       <Stack.Screen
         name="Components"
         component={Components}

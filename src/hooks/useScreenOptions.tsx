@@ -16,13 +16,14 @@ import Text from '../components/Text';
 import useTheme from '../hooks/useTheme';
 import Button from '../components/Button';
 import Block from '../components/Block';
+import {useSelector} from 'react-redux';
 
 export default () => {
   const {t} = useTranslation();
   const {user} = useData();
   const navigation = useNavigation();
   const {icons, colors, gradients, sizes} = useTheme();
-
+  const totalCartItems = useSelector((state) => state.carts.total);
   const menu = {
     headerStyle: {elevation: 0},
     headerTitleAlign: 'left',
@@ -40,7 +41,7 @@ export default () => {
     ),
     headerRight: () => (
       <Block row flex={0} align="center" marginRight={sizes.padding}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{marginRight: sizes.sm}}
           onPress={() =>
             navigation.navigate('Screens', {
@@ -57,29 +58,31 @@ export default () => {
             position="absolute"
             gradient={gradients?.primary}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
             navigation.navigate('Screens', {
-              screen: 'Pro',
-            })
-          }>
+              screen: 'Cart',
+            });
+          }}>
           <Image source={icons.basket} radius={0} color={colors.icon} />
-          <Block
-            flex={0}
-            padding={0}
-            justify="center"
-            position="absolute"
-            top={-sizes.s}
-            right={-sizes.s}
-            width={sizes.sm}
-            height={sizes.sm}
-            radius={sizes.sm / 2}
-            gradient={gradients?.primary}>
-            <Text white center bold size={10} lineHeight={10} paddingTop={3}>
-              3
-            </Text>
-          </Block>
+          {totalCartItems ? (
+            <Block
+              flex={0}
+              padding={0}
+              justify="center"
+              position="absolute"
+              top={-sizes.s}
+              right={-sizes.s}
+              width={sizes.sm}
+              height={sizes.sm}
+              radius={sizes.sm / 2}
+              gradient={gradients?.primary}>
+              <Text white center bold size={10} lineHeight={10} paddingTop={3}>
+                {totalCartItems}
+              </Text>
+            </Block>
+          ) : null}
         </TouchableOpacity>
       </Block>
     ),

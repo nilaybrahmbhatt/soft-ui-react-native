@@ -19,3 +19,4 @@ export {default as Shopping} from './Pro';
 export {default as Pro} from './Pro';
 export {default as CategoryInfo} from './CategoryInfo';
 export {default as ProductInfo} from './ProductInfo';
+export {default as Cart} from './Cart';
