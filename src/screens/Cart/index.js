@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react';
-import {View, WebView, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
+import { WebView } from 'react-native-webview';
 import styles from './styles';
 import {connect} from 'react-redux';
 import {Languages} from '../../common';
@@ -42,8 +43,9 @@ class Cart extends PureComponent {
   };
 
   onCloseCheckout = () => {
+    this.refs.CheckOutModal.close();
     // this.props.navigation.navigate('MyOrders')
-    this.props.emptyCart();
+    // this.props.emptyCart();
   };
 
   onShowCheckOut() {
@@ -72,7 +74,7 @@ class Cart extends PureComponent {
 
     // finish checkout
     let cartItem = await ShopifyAPI.initCart(lineItems);
-    // console.log(cartItem);
+    console.log(cartItem);
     // console.log(index,cartItems.length - 1);
 
     await self.setState({checkoutUrl: cartItem.webUrl});
@@ -121,34 +123,35 @@ class Cart extends PureComponent {
   render() {
     const {onViewProduct, navigation, cartItems, onViewHome} = this.props;
     const {currentIndex} = this.state;
-    // const renderCheckoutUrl = () => (
-    //   <Modal
-    //     ref="CheckOutModal"
-    //     backdropPressToClose={false}
-    //     backButtonClose={true}
-    //     swipeToClose={false}
-    //     onClosed={this.onCloseCheckout}
-    //     style={styles.checkoutModal}>
-    //     <TouchableOpacity
-    //       style={styles.iconZoom}
-    //       onPress={this.onCloseCheckout}>
-    //       <Ionicons
-    //         name="ios-close"
-    //         size={20}
-    //         style={styles.iconClose}
-    //         color="#666"
-    //       />
-    //       <Text style={styles.textClose}>CLOSE</Text>
-    //     </TouchableOpacity>
+    const renderCheckoutUrl = () => (
+      <Modal
+        ref="CheckOutModal"
+        backdropPressToClose={false}
+        backButtonClose={true}
+        swipeToClose={false}
+        onClosed={this.onCloseCheckout}
+        style={styles.checkoutModal}>
+        <TouchableOpacity
+          style={styles.iconZoom}
+          onPress={this.onCloseCheckout}>
+          <Ionicons
+            name="ios-close"
+            size={20}
+            style={styles.iconClose}
+            color="#666"
+          />
+          <Text style={styles.textClose}>CLOSE</Text>
+        </TouchableOpacity>
 
-    //     <WebView
-    //       style={{flex: 1}}
-    //       source={{uri: this.state.checkoutUrl}}
-    //       javaScriptEnabled={true}
-    //       startInLoadingState={true}
-    //     />
-    //   </Modal>
-    // );
+        <WebView
+          style={{flex: 1}}
+          source={{uri: this.state.checkoutUrl}}
+          javaScriptEnabled={true}
+          originWhitelist={['*']}
+          startInLoadingState={true}
+        />
+      </Modal>
+    );
 
     if (currentIndex == 0 && cartItems && cartItems.length == 0) {
       return <Text>Empty</Text>;
@@ -166,7 +169,7 @@ class Cart extends PureComponent {
             />
             <Buttons onPrevious={this.onPrevious} onNext={this.onCheckOut} />
           </View>
-          {/* {renderCheckoutUrl()} */}
+          {renderCheckoutUrl()}
         </View>
       );
     }
@@ -174,12 +177,11 @@ class Cart extends PureComponent {
 }
 
 const mapStateToProps = ({carts, user}) => {
-  console.log(carts);
   return {
     cartItems: carts.cartItems,
     user,
     emptyCart: carts.emptyCart,
-  }
+  };
 };
 function mergeProps(stateProps, dispatchProps, ownProps) {
   const {dispatch} = dispatchProps;

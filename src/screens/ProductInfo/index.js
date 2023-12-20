@@ -8,6 +8,8 @@ import {
   Animated,
   Share,
 } from 'react-native';
+import tinycolor from 'tinycolor2';
+
 import styles from './ProductDetail_Style';
 import {connect} from 'react-redux';
 import {useTheme} from '../../hooks';
@@ -24,7 +26,7 @@ import {
 } from '../../components';
 // import HTMLView from './../../components/HTMLView';
 import AttributesView from './AttributesView';
-import {Styles, Languages, Color, Images, Constants} from '../../common';
+import {Styles, Languages, Images, Constants} from '../../common';
 import Modal from 'react-native-modalbox';
 import {Ionicons} from '@expo/vector-icons';
 import {getProductImage, currencyFormatter, Timer} from '../../common/Omni';
@@ -83,10 +85,12 @@ class Detail extends Component {
 
   openPhoto = () => this.refs.modalPhoto.open();
 
-  getColor(value) {
-    console.log(value);
-    console.log("<<<<<<<<<value>>>>>>>>>");
-    // const color = value.toLowerCase();
+  getColor({value}) {
+    const colorString = value.split(' ').join('');
+    const color = tinycolor(colorString);
+    if (color.isValid()) {
+      return color.toHexString(); // Returns the color in hex format
+    }
     // if (typeof Color.attributes[color] !== 'undefined') {
     //   return Color.attributes[color];
     // }
@@ -142,7 +146,7 @@ class Detail extends Component {
     }
 
     if (go) {
-    //   this.props.onViewCart();
+      //   this.props.onViewCart();
     }
   };
 
