@@ -6,6 +6,7 @@ import Modal from './Modal';
 import Switch from './Switch';
 import Checkbox from './Checkbox';
 import Image from './Image';
+import Carousel from './Carousel';
 import Article from './Article';
 import Product from './Product';
 import ScrollViewEx from './ScrollViewEx';
@@ -25,4 +26,5 @@ export {
   ScrollViewEx,
   ProductSize,
   ProductColor,
+  Carousel,
 };
