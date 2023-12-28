@@ -2,37 +2,43 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {Linking, Platform} from 'react-native';
 import {useNavigation} from '@react-navigation/core';
 
-import {useData, useTheme, useTranslation} from '../hooks/';
+import {useTheme, useTranslation} from '../hooks/';
 import * as regex from '../constants/regex';
 import {Block, Button, Input, Image, Text, Checkbox} from '../components/';
-
+import GraphAPI from '../services/GraphAPI';
+import {useToast} from 'react-native-toast-notifications';
 const isAndroid = Platform.OS === 'android';
 
 interface IRegistration {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   agreed: boolean;
 }
 interface IRegistrationValidation {
-  name: boolean;
+  firstName: boolean;
+  lastName: boolean;
   email: boolean;
   password: boolean;
   agreed: boolean;
 }
 
 const Register = () => {
-  const {isDark} = useData();
+  // const {isDark} = useData();
   const {t} = useTranslation();
+  const toast = useToast();
   const navigation = useNavigation();
   const [isValid, setIsValid] = useState<IRegistrationValidation>({
-    name: false,
+    firstName: false,
+    lastName: false,
     email: false,
     password: false,
     agreed: false,
   });
   const [registration, setRegistration] = useState<IRegistration>({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     agreed: false,
@@ -40,23 +46,29 @@ const Register = () => {
   const {assets, colors, gradients, sizes} = useTheme();
 
   const handleChange = useCallback(
-    (value) => {
+    (value: IRegistration) => {
       setRegistration((state) => ({...state, ...value}));
     },
     [setRegistration],
   );
 
-  const handleSignUp = useCallback(() => {
+  const handleSignUp = useCallback(async () => {
     if (!Object.values(isValid).includes(false)) {
-      /** send/save registratin data */
-      console.log('handleSignUp', registration);
+      let id = toast.show('Loading...');
+      const response = await GraphAPI.registerUser(registration);
+      if (response.error) {
+        toast.update(id, response.error, {type: 'danger'});
+      } else {
+        toast.update(id, 'Registration successful.', {type: 'success'});
+      }
     }
-  }, [isValid, registration]);
+  }, [isValid, registration, toast]);
 
   useEffect(() => {
     setIsValid((state) => ({
       ...state,
-      name: regex.name.test(registration.name),
+      firstName: regex.name.test(registration.firstName),
+      lastName: regex.name.test(registration.lastName),
       email: regex.email.test(registration.email),
       password: regex.password.test(registration.password),
       agreed: registration.agreed,
@@ -64,7 +76,7 @@ const Register = () => {
   }, [registration, setIsValid]);
 
   return (
-    <Block safe marginTop={sizes.md}>
+    <Block safe marginTop={sizes.s}>
       <Block paddingHorizontal={sizes.s}>
         <Block flex={0} style={{zIndex: 0}}>
           <Image
@@ -72,9 +84,9 @@ const Register = () => {
             resizeMode="cover"
             padding={sizes.sm}
             radius={sizes.cardRadius}
-            source={assets.background}
             height={sizes.height * 0.3}>
             <Button
+              marginTop={sizes.md}
               row
               flex={0}
               justify="flex-start"
@@ -83,18 +95,14 @@ const Register = () => {
                 radius={0}
                 width={10}
                 height={18}
-                color={colors.white}
+                color={colors.black}
                 source={assets.arrow}
                 transform={[{rotate: '180deg'}]}
               />
-              <Text p white marginLeft={sizes.s}>
+              <Text p black marginLeft={sizes.s}>
                 {t('common.goBack')}
               </Text>
             </Button>
-
-            <Text h4 center white marginBottom={sizes.md}>
-              {t('register.title')}
-            </Text>
           </Image>
         </Block>
         {/* register form */}
@@ -117,73 +125,24 @@ const Register = () => {
               justify="space-evenly"
               tint={colors.blurTint}
               paddingVertical={sizes.sm}>
-              <Text p semibold center>
-                {t('register.subtitle')}
-              </Text>
-              {/* social buttons */}
-              <Block row center justify="space-evenly" marginVertical={sizes.m}>
-                <Button outlined gray shadow={!isAndroid}>
-                  <Image
-                    source={assets.facebook}
-                    height={sizes.m}
-                    width={sizes.m}
-                    color={isDark ? colors.icon : undefined}
-                  />
-                </Button>
-                <Button outlined gray shadow={!isAndroid}>
-                  <Image
-                    source={assets.apple}
-                    height={sizes.m}
-                    width={sizes.m}
-                    color={isDark ? colors.icon : undefined}
-                  />
-                </Button>
-                <Button outlined gray shadow={!isAndroid}>
-                  <Image
-                    source={assets.google}
-                    height={sizes.m}
-                    width={sizes.m}
-                    color={isDark ? colors.icon : undefined}
-                  />
-                </Button>
-              </Block>
-              <Block
-                row
-                flex={0}
-                align="center"
-                justify="center"
-                marginBottom={sizes.sm}
-                paddingHorizontal={sizes.xxl}>
-                <Block
-                  flex={0}
-                  height={1}
-                  width="50%"
-                  end={[1, 0]}
-                  start={[0, 1]}
-                  gradient={gradients.divider}
-                />
-                <Text center marginHorizontal={sizes.s}>
-                  {t('common.or')}
-                </Text>
-                <Block
-                  flex={0}
-                  height={1}
-                  width="50%"
-                  end={[0, 1]}
-                  start={[1, 0]}
-                  gradient={gradients.divider}
-                />
-              </Block>
-              {/* form inputs */}
               <Block paddingHorizontal={sizes.sm}>
                 <Input
                   autoCapitalize="none"
                   marginBottom={sizes.m}
-                  label={t('common.name')}
-                  placeholder={t('common.namePlaceholder')}
-                  success={Boolean(registration.name && isValid.name)}
-                  danger={Boolean(registration.name && !isValid.name)}
-                  onChangeText={(value) => handleChange({name: value})}
+                  label={t('common.firstName')}
+                  placeholder={t('common.firstNamePlaceholder')}
+                  success={Boolean(registration.firstName && isValid.firstName)}
+                  danger={Boolean(registration.firstName && !isValid.firstName)}
+                  onChangeText={(value) => handleChange({firstName: value})}
+                />
+                <Input
+                  autoCapitalize="none"
+                  marginBottom={sizes.m}
+                  label={t('common.lastName')}
+                  placeholder={t('common.lastNamePlaceholder')}
+                  success={Boolean(registration.lastName && isValid.lastName)}
+                  danger={Boolean(registration.lastName && !isValid.lastName)}
+                  onChangeText={(value) => handleChange({lastName: value})}
                 />
                 <Input
                   autoCapitalize="none"
@@ -240,7 +199,7 @@ const Register = () => {
                 shadow={!isAndroid}
                 marginVertical={sizes.s}
                 marginHorizontal={sizes.sm}
-                onPress={() => navigation.navigate('Pro')}>
+                onPress={() => navigation.navigate('Login')}>
                 <Text bold primary transform="uppercase">
                   {t('common.signin')}
                 </Text>
