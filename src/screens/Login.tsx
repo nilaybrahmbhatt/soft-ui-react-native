@@ -10,7 +10,6 @@ import GraphAPI from '../services/GraphAPI';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 // import {getElementsByTagType} from '../components/HTMLView/vendor/htmlparser2';
-
 const isAndroid = Platform.OS === 'android';
 
 interface ILogin {
@@ -39,7 +38,7 @@ const Login = () => {
     email: '',
     password: '',
   });
-  const {assets, colors, sizes} = useTheme();
+  const {assets, colors, sizes, gradients} = useTheme();
 
   const handleChange = useCallback(
     (value: any) => {
@@ -58,7 +57,7 @@ const Login = () => {
         toast.update(id, response.success, {type: 'success'});
       }
     }
-  }, [isValid, login, toast]);
+  }, [dispatch, isValid, login, toast]);
 
   useEffect(() => {
     setIsValid((state) => ({
@@ -158,6 +157,15 @@ const Login = () => {
                 onPress={handleSignIn}>
                 <Text bold primary transform="uppercase">
                   {t('common.signin')}
+                </Text>
+              </Button>
+              <Button
+                onPress={() => navigation.navigate('Register')}
+                marginVertical={sizes.s}
+                marginHorizontal={sizes.sm}
+                gradient={gradients.primary}>
+                <Text bold white transform="uppercase">
+                  {t('common.signup')}
                 </Text>
               </Button>
             </Block>

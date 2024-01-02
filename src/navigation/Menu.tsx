@@ -105,34 +105,36 @@ const DrawerContent = (props: any): React.ReactNode => {
       renderToHardwareTextureAndroid
       contentContainerStyle={{paddingBottom: sizes.padding}}>
       <Block paddingHorizontal={sizes.padding} paddingVertical={20}>
-        <Block flex={0} align="center" marginBottom={sizes.l}>
+        <Block flex={0} row align="center" marginBottom={sizes.l}>
           <Image
             radius={0}
             width={33}
             height={33}
             color={colors.text}
-            source={assets.logo}
+            source={assets.profile}
             marginRight={sizes.sm}
           />
           {user?.user ? (
             <Block>
-              <Text size={12} semibold>
+              <Text size={14} bold>
                 {user.user.displayName}
               </Text>
-              <Text size={12} semibold>
+              <Text
+                size={12}
+                semibold
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                color={labelColor}>
                 {user.user.email}
-              </Text>
-              <Text size={12} semibold>
-                {user.user.phone}
               </Text>
             </Block>
           ) : (
             <Block>
-              <Text size={12} semibold>
-                Login
+              <Text size={16} semibold>
+                Welcome,
               </Text>
-              <Text size={12} semibold>
-                Signup
+              <Text size={14} semibold>
+                User
               </Text>
             </Block>
           )}
@@ -140,7 +142,7 @@ const DrawerContent = (props: any): React.ReactNode => {
         <Block
           flex={0}
           height={1}
-          marginRight={sizes.md}
+          marginRight={sizes.sm}
           gradient={gradients.menu}
         />
         {screens?.map((screen, index) => {
@@ -175,6 +177,13 @@ const DrawerContent = (props: any): React.ReactNode => {
             </Button>
           );
         })}
+        <Block
+          flex={0}
+          height={1}
+          marginRight={sizes.sm}
+          marginVertical={sizes.sm}
+          gradient={gradients.menu}
+        />
         {customCategoriesList.map((category, index) => {
           return (
             <View key={`menu-screen-${category.handle}-${index}`}>
@@ -224,17 +233,18 @@ const DrawerContent = (props: any): React.ReactNode => {
         <Block
           flex={0}
           height={1}
-          marginRight={sizes.md}
+          marginRight={sizes.sm}
           marginVertical={sizes.sm}
           gradient={gradients.menu}
         />
 
-        <Text semibold transform="uppercase" opacity={0.5}>
+        {/* <Text semibold transform="uppercase" opacity={0.5}>
           {t('menu.documentation')}
-        </Text>
-
+        </Text> */}
         <Block row justify="space-between" marginTop={sizes.sm}>
-          <Text color={labelColor}>Logout</Text>
+          <Text semibold transform="uppercase">
+            Logout
+          </Text>
         </Block>
       </Block>
     </DrawerContentScrollView>
