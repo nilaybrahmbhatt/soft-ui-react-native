@@ -6,7 +6,7 @@ import {
   ScaledSize,
   TextStyle,
 } from 'react-native';
-import { Image } from 'react-native-animatable';
+// import { Image } from 'react-native-animatable';
 
 // Spacing types
 export interface ISpacing

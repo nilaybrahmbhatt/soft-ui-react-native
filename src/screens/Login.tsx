@@ -54,6 +54,7 @@ const Login = () => {
       if (response.error) {
         toast.update(id, response.error, {type: 'danger'});
       } else {
+        navigation.goBack()
         toast.update(id, response.success, {type: 'success'});
       }
     }

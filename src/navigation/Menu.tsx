@@ -1,6 +1,8 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated, Linking, StyleSheet, View} from 'react-native';
 import CategoriesApi from '../redux/Categories/actions';
+import UserApi from '../redux/User/actions';
+
 import {useDispatch, useSelector} from 'react-redux';
 import {
   useIsDrawerOpen,
@@ -67,12 +69,12 @@ const ScreensStack = () => {
 const DrawerContent = (props: any): React.ReactNode => {
   const {navigation, user, categories, loading} = props;
   const customCategoriesList = CustomCategories;
-  console.log('user >>>>>>>', user);
 
   const {t} = useTranslation();
   // const {isDark, handleIsDark} = useData();
   const [active, setActive] = useState('Home');
   const {assets, colors, gradients, sizes} = useTheme();
+  const dispatch = useDispatch();
   // const user = useSelector((s) => s.user.user);
   const labelColor = colors.text;
 
@@ -84,6 +86,10 @@ const DrawerContent = (props: any): React.ReactNode => {
     [navigation, setActive],
   );
 
+  const userLogout = () => {
+    UserApi.logout(dispatch);
+  };
+
   // const handleWebLink = useCallback((url: string) => Linking.openURL(url), []);
   const screens = [
     {name: t('screens.home'), to: 'Home', icon: assets.home},
@@ -92,11 +98,21 @@ const DrawerContent = (props: any): React.ReactNode => {
     // {name: t('screens.rental'), to: 'Pro', icon: assets.rental},
     // {name: t('screens.profile'), to: 'Profile', icon: assets.profile},
     // {name: t('screens.settings'), to: 'Pro', icon: assets.settings},
-    {name: t('screens.register'), to: 'Register', icon: assets.register},
-    {name: 'Login', to: 'Login', icon: assets.register},
+    // {name: t('screens.register'), to: 'Register', icon: assets.register},
+    // {name: 'Login', to: 'Login', icon: assets.register},
     // {name: t('screens.extra'), to: 'Pro', icon: assets.extras},
   ];
-
+  if (user?.user) {
+    screens.push({name: 'My Orders', to: 'My Orders', icon: assets.register});
+    screens.push({name: 'My Account', to: 'My Orders', icon: assets.register});
+  } else {
+    screens.push({
+      name: t('screens.register'),
+      to: 'Register',
+      icon: assets.register,
+    });
+    screens.push({name: 'Login', to: 'Login', icon: assets.register});
+  }
   return (
     <DrawerContentScrollView
       {...props}
@@ -107,10 +123,9 @@ const DrawerContent = (props: any): React.ReactNode => {
       <Block paddingHorizontal={sizes.padding} paddingVertical={20}>
         <Block flex={0} row align="center" marginBottom={sizes.l}>
           <Image
-            radius={0}
-            width={33}
-            height={33}
-            color={colors.text}
+            radius={100}
+            width={50}
+            height={50}
             source={assets.profile}
             marginRight={sizes.sm}
           />
@@ -120,8 +135,7 @@ const DrawerContent = (props: any): React.ReactNode => {
                 {user.user.displayName}
               </Text>
               <Text
-                size={12}
-                semibold
+                size={10}
                 numberOfLines={1}
                 ellipsizeMode="tail"
                 color={labelColor}>
@@ -229,7 +243,6 @@ const DrawerContent = (props: any): React.ReactNode => {
             </View>
           );
         })}
-
         <Block
           flex={0}
           height={1}
@@ -237,15 +250,15 @@ const DrawerContent = (props: any): React.ReactNode => {
           marginVertical={sizes.sm}
           gradient={gradients.menu}
         />
-
-        {/* <Text semibold transform="uppercase" opacity={0.5}>
-          {t('menu.documentation')}
-        </Text> */}
-        <Block row justify="space-between" marginTop={sizes.sm}>
-          <Text semibold transform="uppercase">
-            Logout
-          </Text>
-        </Block>
+        {user?.user ? (
+          <Block row justify="space-between" marginTop={sizes.sm}>
+            <Button row justify="flex-start" onPress={userLogout}>
+              <Text semibold transform="uppercase">
+                Logout
+              </Text>
+            </Button>
+          </Block>
+        ) : null}
       </Block>
     </DrawerContentScrollView>
   );
