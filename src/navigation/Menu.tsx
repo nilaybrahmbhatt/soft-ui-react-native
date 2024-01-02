@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated, Linking, StyleSheet, View} from 'react-native';
 import CategoriesApi from '../redux/Categories/actions';
@@ -114,153 +115,165 @@ const DrawerContent = (props: any): React.ReactNode => {
     screens.push({name: 'Login', to: 'Login', icon: assets.register});
   }
   return (
-    <DrawerContentScrollView
-      {...props}
-      scrollEnabled
-      removeClippedSubviews
-      renderToHardwareTextureAndroid
-      contentContainerStyle={{paddingBottom: sizes.padding}}>
-      <Block paddingHorizontal={sizes.padding} paddingVertical={20}>
-        <Block flex={0} row align="center" marginBottom={sizes.l}>
-          <Image
-            radius={100}
-            width={50}
-            height={50}
-            source={assets.profile}
-            marginRight={sizes.sm}
-          />
-          {user?.user ? (
-            <Block>
-              <Text size={14} bold>
-                {user.user.displayName}
-              </Text>
-              <Text
-                size={10}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                color={labelColor}>
-                {user.user.email}
-              </Text>
-            </Block>
-          ) : (
-            <Block>
-              <Text size={16} semibold>
-                Welcome,
-              </Text>
-              <Text size={14} semibold>
-                User
-              </Text>
-            </Block>
-          )}
-        </Block>
-        <Block
-          flex={0}
-          height={1}
-          marginRight={sizes.sm}
-          gradient={gradients.menu}
-        />
-        {screens?.map((screen, index) => {
-          const isActive = active === screen.to;
-          return (
-            <Button
-              row
-              justify="flex-start"
-              marginBottom={sizes.s}
-              key={`menu-screen-${screen.name}-${index}`}
-              onPress={() => handleNavigation(screen.to)}>
-              <Block
-                flex={0}
-                radius={6}
-                align="center"
-                justify="center"
-                width={sizes.md}
-                height={sizes.md}
-                marginRight={sizes.s}
-                gradient={gradients[isActive ? 'primary' : 'white']}>
-                <Image
-                  radius={0}
-                  width={14}
-                  height={14}
-                  source={screen.icon}
-                  color={colors[isActive ? 'white' : 'black']}
-                />
+    <>
+      <DrawerContentScrollView
+        {...props}
+        scrollEnabled
+        removeClippedSubviews
+        renderToHardwareTextureAndroid
+        contentContainerStyle={{paddingBottom: sizes.padding}}>
+        <Block paddingHorizontal={sizes.padding} paddingVertical={20}>
+          <Block flex={0} row align="center" marginBottom={sizes.l}>
+            <Image
+              radius={100}
+              width={50}
+              height={50}
+              source={assets.profile}
+              marginRight={sizes.sm}
+            />
+            {user?.user ? (
+              <Block>
+                <Text size={14} bold>
+                  {user.user.displayName}
+                </Text>
+                <Text
+                  size={10}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  color={labelColor}>
+                  {user.user.email}
+                </Text>
               </Block>
-              <Text p semibold={isActive} color={labelColor}>
-                {screen.name}
-              </Text>
-            </Button>
-          );
-        })}
-        <Block
-          flex={0}
-          height={1}
-          marginRight={sizes.sm}
-          marginVertical={sizes.sm}
-          gradient={gradients.menu}
-        />
-        {customCategoriesList.map((category, index) => {
-          return (
-            <View key={`menu-screen-${category.handle}-${index}`}>
+            ) : (
+              <Block>
+                <Text size={16} semibold>
+                  Welcome,
+                </Text>
+                <Text size={14} semibold>
+                  User
+                </Text>
+              </Block>
+            )}
+          </Block>
+          <Block
+            flex={0}
+            height={1}
+            marginRight={sizes.sm}
+            gradient={gradients.menu}
+          />
+          {screens?.map((screen, index) => {
+            const isActive = active === screen.to;
+            return (
               <Button
                 row
-                justify="flex-start"
-                marginBottom={sizes.s}
-                onPress={() => {
-                  if (category.children) {
-                    if (active !== category.handle) {
-                      setActive(category.handle);
-                    }
-                  } else {
-                    handleNavigation('CategoryInfo', {category});
-                  }
-                }}>
-                <Text p color={labelColor}>
-                  {category.name}
+                justify="space-between"
+                key={`menu-screen-${screen.name}-${index}`}
+                onPress={() => handleNavigation(screen.to)}>
+                {/* <Block
+                  flex={0}
+                  radius={6}
+                  align="center"
+                  justify="center"
+                  width={sizes.md}
+                  height={sizes.md}
+                  marginRight={sizes.s}
+                  gradient={gradients[isActive ? 'primary' : 'white']}>
+                  <Image
+                    radius={0}
+                    width={14}
+                    height={14}
+                    source={screen.icon}
+                    color={colors[isActive ? 'white' : 'black']}
+                  />
+                </Block> */}
+                <Text
+                  p
+                  semibold={isActive}
+                  color={isActive ? colors.primary : labelColor}>
+                  {screen.name}
                 </Text>
+                <Image width={10} height={10} source={assets.arrow} />
               </Button>
-              {category.children ? (
-                <Collapsible collapsed={!(active === category.handle)}>
-                  <Block marginLeft={10}>
-                    {category.children.map((child, i) => {
-                      return (
-                        <Button
-                          key={`menu-screen-${child.handle}-${i}`}
-                          row
-                          justify="flex-start"
-                          marginBottom={sizes.s}
-                          onPress={() => {
-                            handleNavigation('CategoryInfo', {category: child});
-                          }}>
-                          <Text p color={labelColor}>
-                            {child.name}
-                          </Text>
-                        </Button>
-                      );
-                    })}
-                  </Block>
-                </Collapsible>
-              ) : null}
-            </View>
-          );
-        })}
-        <Block
-          flex={0}
-          height={1}
-          marginRight={sizes.sm}
-          marginVertical={sizes.sm}
-          gradient={gradients.menu}
-        />
-        {user?.user ? (
-          <Block row justify="space-between" marginTop={sizes.sm}>
-            <Button row justify="flex-start" onPress={userLogout}>
-              <Text semibold transform="uppercase">
-                Logout
-              </Text>
-            </Button>
-          </Block>
-        ) : null}
-      </Block>
-    </DrawerContentScrollView>
+            );
+          })}
+          <Text marginVertical={10} bold size={20}>
+            Categories
+          </Text>
+          {/* <Block flex={0} height={1} gradient={gradients.menu} /> */}
+          {customCategoriesList.map((category, index) => {
+            return (
+              <View key={`menu-screen-${category.handle}-${index}`}>
+                <Button
+                  row
+                  justify="space-between"
+                  marginBottom={sizes.s}
+                  onPress={() => {
+                    if (category.children) {
+                      if (active !== category.handle) {
+                        setActive(category.handle);
+                      } else {
+                        setActive(null);
+                      }
+                    } else {
+                      handleNavigation('CategoryInfo', {category});
+                    }
+                  }}>
+                  <Text p color={labelColor}>
+                    {category.name}
+                  </Text>
+                  <Image
+                    width={10}
+                    height={10}
+                    source={assets.arrow}
+                    style={{
+                      transform: [
+                        {rotate: active === category.handle ? '90deg' : '0deg'},
+                      ],
+                    }}
+                  />
+                </Button>
+                {category.children ? (
+                  <Collapsible collapsed={!(active === category.handle)}>
+                    <Block marginLeft={10}>
+                      {category.children.map((child, i) => {
+                        return (
+                          <Button
+                            key={`menu-screen-${child.handle}-${i}`}
+                            row
+                            justify="flex-start"
+                            marginBottom={sizes.s}
+                            onPress={() => {
+                              handleNavigation('CategoryInfo', {
+                                category: child,
+                              });
+                            }}>
+                            <Text p color={labelColor}>
+                              {child.name}
+                            </Text>
+                          </Button>
+                        );
+                      })}
+                    </Block>
+                  </Collapsible>
+                ) : null}
+              </View>
+            );
+          })}
+        </Block>
+      </DrawerContentScrollView>
+      {user?.user ? (
+        <Button
+          paddingHorizontal={20}
+          marginBottom={25}
+          row
+          justify="flex-start"
+          onPress={userLogout}>
+          <Text semibold transform="uppercase">
+            Logout
+          </Text>
+        </Button>
+      ) : null}
+    </>
   );
 };
 
@@ -279,7 +292,7 @@ const MenuDefault = (props: any) => {
   }, []);
 
   return (
-    <Block gradient={gradients.light}>
+    <Block>
       <Drawer.Navigator
         drawerType="slide"
         overlayColor="transparent"
