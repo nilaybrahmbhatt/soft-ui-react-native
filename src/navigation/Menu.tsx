@@ -1,6 +1,9 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated, Linking, StyleSheet, View} from 'react-native';
 import CategoriesApi from '../redux/Categories/actions';
+import UserApi from '../redux/User/actions';
+
 import {useDispatch, useSelector} from 'react-redux';
 import {
   useIsDrawerOpen,
@@ -65,14 +68,15 @@ const ScreensStack = () => {
 
 /* custom drawer menu */
 const DrawerContent = (props: any): React.ReactNode => {
-  const {navigation, categories, loading} = props;
+  const {navigation, user, categories, loading} = props;
   const customCategoriesList = CustomCategories;
-  
-  
+
   const {t} = useTranslation();
   // const {isDark, handleIsDark} = useData();
   const [active, setActive] = useState('Home');
   const {assets, colors, gradients, sizes} = useTheme();
+  const dispatch = useDispatch();
+  // const user = useSelector((s) => s.user.user);
   const labelColor = colors.text;
 
   const handleNavigation = useCallback(
@@ -83,9 +87,11 @@ const DrawerContent = (props: any): React.ReactNode => {
     [navigation, setActive],
   );
 
-  // const handleWebLink = useCallback((url: string) => Linking.openURL(url), []);
+  const userLogout = () => {
+    UserApi.logout(dispatch);
+  };
 
-  // screen list for Drawer menu
+  // const handleWebLink = useCallback((url: string) => Linking.openURL(url), []);
   const screens = [
     {name: t('screens.home'), to: 'Home', icon: assets.home},
     // {name: t('screens.components'), to: 'Components', icon: assets.components},
@@ -94,138 +100,180 @@ const DrawerContent = (props: any): React.ReactNode => {
     // {name: t('screens.profile'), to: 'Profile', icon: assets.profile},
     // {name: t('screens.settings'), to: 'Pro', icon: assets.settings},
     // {name: t('screens.register'), to: 'Register', icon: assets.register},
+    // {name: 'Login', to: 'Login', icon: assets.register},
     // {name: t('screens.extra'), to: 'Pro', icon: assets.extras},
   ];
-
+  if (user?.user) {
+    screens.push({name: 'My Orders', to: 'My Orders', icon: assets.register});
+    screens.push({name: 'My Account', to: 'My Orders', icon: assets.register});
+  } else {
+    screens.push({
+      name: t('screens.register'),
+      to: 'Register',
+      icon: assets.register,
+    });
+    screens.push({name: 'Login', to: 'Login', icon: assets.register});
+  }
   return (
-    <DrawerContentScrollView
-      {...props}
-      scrollEnabled
-      removeClippedSubviews
-      renderToHardwareTextureAndroid
-      contentContainerStyle={{paddingBottom: sizes.padding}}>
-      <Block paddingHorizontal={sizes.padding}>
-        <Block flex={0} row align="center" marginBottom={sizes.l}>
-          <Image
-            radius={0}
-            width={33}
-            height={33}
-            color={colors.text}
-            source={assets.logo}
-            marginRight={sizes.sm}
-          />
-          <Block>
-            <Text size={12} semibold>
-              {t('app.name')}
-            </Text>
-            <Text size={12} semibold>
-              {t('app.native')}
-            </Text>
-          </Block>
-        </Block>
-
-        {screens?.map((screen, index) => {
-          const isActive = active === screen.to;
-          return (
-            <Button
-              row
-              justify="flex-start"
-              marginBottom={sizes.s}
-              key={`menu-screen-${screen.name}-${index}`}
-              onPress={() => handleNavigation(screen.to)}>
-              <Block
-                flex={0}
-                radius={6}
-                align="center"
-                justify="center"
-                width={sizes.md}
-                height={sizes.md}
-                marginRight={sizes.s}
-                gradient={gradients[isActive ? 'primary' : 'white']}>
-                <Image
-                  radius={0}
-                  width={14}
-                  height={14}
-                  source={screen.icon}
-                  color={colors[isActive ? 'white' : 'black']}
-                />
+    <>
+      <DrawerContentScrollView
+        {...props}
+        scrollEnabled
+        removeClippedSubviews
+        renderToHardwareTextureAndroid
+        contentContainerStyle={{paddingBottom: sizes.padding}}>
+        <Block paddingHorizontal={sizes.padding} paddingVertical={20}>
+          <Block flex={0} row align="center" marginBottom={sizes.l}>
+            <Image
+              radius={100}
+              width={50}
+              height={50}
+              source={assets.profile}
+              marginRight={sizes.sm}
+            />
+            {user?.user ? (
+              <Block>
+                <Text size={14} bold>
+                  {user.user.displayName}
+                </Text>
+                <Text
+                  size={10}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  color={labelColor}>
+                  {user.user.email}
+                </Text>
               </Block>
-              <Text p semibold={isActive} color={labelColor}>
-                {screen.name}
-              </Text>
-            </Button>
-          );
-        })}
-        {customCategoriesList.map((category, index) => {
-          return (
-            <View key={`menu-screen-${category.handle}-${index}`}>
+            ) : (
+              <Block>
+                <Text size={16} semibold>
+                  Welcome,
+                </Text>
+                <Text size={14} semibold>
+                  User
+                </Text>
+              </Block>
+            )}
+          </Block>
+          <Block
+            flex={0}
+            height={1}
+            marginRight={sizes.sm}
+            gradient={gradients.menu}
+          />
+          {screens?.map((screen, index) => {
+            const isActive = active === screen.to;
+            return (
               <Button
                 row
-                justify="flex-start"
-                marginBottom={sizes.s}
-                onPress={() => {
-                  if (category.children) {
-                    if (active !== category.handle) {
-                      setActive(category.handle);
-                    }
-                  } else {
-                    handleNavigation('CategoryInfo', {category});
-                  }
-                }}>
-                <Text p color={labelColor}>
-                  {category.name}
+                justify="space-between"
+                key={`menu-screen-${screen.name}-${index}`}
+                onPress={() => handleNavigation(screen.to)}>
+                {/* <Block
+                  flex={0}
+                  radius={6}
+                  align="center"
+                  justify="center"
+                  width={sizes.md}
+                  height={sizes.md}
+                  marginRight={sizes.s}
+                  gradient={gradients[isActive ? 'primary' : 'white']}>
+                  <Image
+                    radius={0}
+                    width={14}
+                    height={14}
+                    source={screen.icon}
+                    color={colors[isActive ? 'white' : 'black']}
+                  />
+                </Block> */}
+                <Text
+                  p
+                  semibold={isActive}
+                  color={isActive ? colors.primary : labelColor}>
+                  {screen.name}
                 </Text>
+                <Image width={10} height={10} source={assets.arrow} />
               </Button>
-              {category.children ? (
-                <Collapsible collapsed={!(active === category.handle)}>
-                  <Block marginLeft={10}>
-                    {category.children.map((child, i) => {
-                      return (
-                        <Button
-                          key={`menu-screen-${child.handle}-${i}`}
-                          row
-                          justify="flex-start"
-                          marginBottom={sizes.s}
-                          onPress={() => {
-                            handleNavigation('CategoryInfo', {category: child});
-                          }}>
-                          <Text p color={labelColor}>
-                            {child.name}
-                          </Text>
-                        </Button>
-                      );
-                    })}
-                  </Block>
-                </Collapsible>
-              ) : null}
-            </View>
-          );
-        })}
-
-        <Block
-          flex={0}
-          height={1}
-          marginRight={sizes.md}
-          marginVertical={sizes.sm}
-          gradient={gradients.menu}
-        />
-
-        <Text semibold transform="uppercase" opacity={0.5}>
-          {t('menu.documentation')}
-        </Text>
-
-        {/* <Block row justify="space-between" marginTop={sizes.sm}>
-          <Text color={labelColor}>{t('darkMode')}</Text>
-          <Switch
-            checked={isDark}
-            onPress={(checked) => {
-              handleIsDark(checked);
-              Alert.alert(t('pro.title'), t('pro.alert'));
-            }}
-          />
-        </Block> */}
-      </Block>
-    </DrawerContentScrollView>
+            );
+          })}
+          <Text marginVertical={10} bold size={20}>
+            Categories
+          </Text>
+          {/* <Block flex={0} height={1} gradient={gradients.menu} /> */}
+          {customCategoriesList.map((category, index) => {
+            return (
+              <View key={`menu-screen-${category.handle}-${index}`}>
+                <Button
+                  row
+                  justify="space-between"
+                  marginBottom={sizes.s}
+                  onPress={() => {
+                    if (category.children) {
+                      if (active !== category.handle) {
+                        setActive(category.handle);
+                      } else {
+                        setActive(null);
+                      }
+                    } else {
+                      handleNavigation('CategoryInfo', {category});
+                    }
+                  }}>
+                  <Text p color={labelColor}>
+                    {category.name}
+                  </Text>
+                  <Image
+                    width={10}
+                    height={10}
+                    source={assets.arrow}
+                    style={{
+                      transform: [
+                        {rotate: active === category.handle ? '90deg' : '0deg'},
+                      ],
+                    }}
+                  />
+                </Button>
+                {category.children ? (
+                  <Collapsible collapsed={!(active === category.handle)}>
+                    <Block marginLeft={10}>
+                      {category.children.map((child, i) => {
+                        return (
+                          <Button
+                            key={`menu-screen-${child.handle}-${i}`}
+                            row
+                            justify="flex-start"
+                            marginBottom={sizes.s}
+                            onPress={() => {
+                              handleNavigation('CategoryInfo', {
+                                category: child,
+                              });
+                            }}>
+                            <Text p color={labelColor}>
+                              {child.name}
+                            </Text>
+                          </Button>
+                        );
+                      })}
+                    </Block>
+                  </Collapsible>
+                ) : null}
+              </View>
+            );
+          })}
+        </Block>
+      </DrawerContentScrollView>
+      {user?.user ? (
+        <Button
+          paddingHorizontal={20}
+          marginBottom={25}
+          row
+          justify="flex-start"
+          onPress={userLogout}>
+          <Text semibold transform="uppercase">
+            Logout
+          </Text>
+        </Button>
+      ) : null}
+    </>
   );
 };
 
@@ -236,6 +284,7 @@ const MenuDefault = (props: any) => {
   const categories = useSelector(
     (state: {categories: any}) => state.categories,
   );
+  const user = useSelector((state: {user: any}) => state.user);
   const loading = categories.isFetching;
   const categoriesList = categories.list;
   useEffect(() => {
@@ -243,7 +292,7 @@ const MenuDefault = (props: any) => {
   }, []);
 
   return (
-    <Block gradient={gradients.light}>
+    <Block>
       <Drawer.Navigator
         drawerType="slide"
         overlayColor="transparent"
@@ -252,6 +301,7 @@ const MenuDefault = (props: any) => {
           <DrawerContent
             {...props}
             categories={categoriesList}
+            user={user}
             loading={loading}
           />
         )}

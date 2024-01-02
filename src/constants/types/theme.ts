@@ -6,6 +6,7 @@ import {
   ScaledSize,
   TextStyle,
 } from 'react-native';
+// import { Image } from 'react-native-animatable';
 
 // Spacing types
 export interface ISpacing
@@ -252,6 +253,7 @@ export interface ThemeAssets {
   OpenSansBold?: any;
 
   logo: ImageSourcePropType;
+  profile: ImageSourcePropType;
   header: ImageSourcePropType;
   background: ImageSourcePropType;
 
